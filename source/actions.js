@@ -8,8 +8,6 @@ import {
     NO_VALUE
 } from './constants'
 
-import Promise from 'bluebird'
-
 
 const getWatchPath = (event, path) =>  event + ':' + ((path.substring(0,1) == '/') ? '': '/') + path
 

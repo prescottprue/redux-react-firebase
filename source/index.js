@@ -9,10 +9,6 @@ module.exports = {
   firebase: connect,
   firebaseStateReducer: reducer,
   reduxReactFirebase: compose,
-  helpers,
+  helpers
 }
-
-
-
-
 

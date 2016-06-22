@@ -2,11 +2,8 @@
 import Firebase from 'firebase'
 import * as Actions from './actions'
 
-
-
 export default (url, config) => {
   return next => (reducer, initialState) => {
-
     const defaultConfig = {
       userProfile: null
     }
@@ -25,15 +22,14 @@ export default (url, config) => {
         watchers: {},
         config: configs,
         authUid: null
-      },
+      }
     }
-
 
     const set = (path, value, onComplete) => ref.child(path).set(value, onComplete)
     const push = (path, value, onComplete) => ref.child(path).push(value, onComplete)
     const remove = (path, onComplete) => ref.child(path).remove(onComplete)
     const watchEvent = (eventName, eventPath) => Actions.watchEvent(firebase, dispatch, eventName, eventPath, true)
-    const unWatchEvent = (eventName, eventPath, queryId=undefined) => Actions.unWatchEvent(firebase, eventName, eventPath, queryId)
+    const unWatchEvent = (eventName, eventPath, queryId = undefined) => Actions.unWatchEvent(firebase, eventName, eventPath, queryId)
     const login = credentials => Actions.login(dispatch, firebase, credentials)
     const logout = () => Actions.logout(dispatch, firebase)
     const createUser = (credentials, profile) => Actions.createUser(dispatch, firebase, credentials, profile)
@@ -48,12 +44,10 @@ export default (url, config) => {
       watchEvent, unWatchEvent
     }
 
-    Actions.init(dispatch,  firebase)
+    Actions.init(dispatch, firebase)
 
     store.firebase = firebase
 
     return store
-
   }
 }
-

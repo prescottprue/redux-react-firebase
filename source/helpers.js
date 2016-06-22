@@ -1,36 +1,32 @@
 
-
 import _ from 'lodash'
 
-const fixPath = path =>  ((path.substring(0,1) == '/') ? '': '/') + path
+const fixPath = path => ((path.substring(0, 1) == '/') ? '' : '/') + path
 
 export const toJS = data => {
-
-  if(data && data.toJS) {
+  if (data && data.toJS) {
     return data.toJS()
   }
 
   return data
 }
 
-
 export const pathToJS = (data, path, notSetValue) => {
-  if(!data) {
+  if (!data) {
     return notSetValue
   }
 
   const pathArr = fixPath(path).split(/\//).slice(1)
 
-  if(data.getIn) {
+  if (data.getIn) {
     return toJS(data.getIn(pathArr, notSetValue))
   }
 
   return data
 }
 
-
 export const dataToJS = (data, path, notSetValue) => {
-  if(!(data && data.getIn)) {
+  if (!(data && data.getIn)) {
     return notSetValue
   }
 
@@ -38,7 +34,7 @@ export const dataToJS = (data, path, notSetValue) => {
 
   const pathArr = dataPath.split(/\//).slice(1)
 
-  if(data.getIn) {
+  if (data.getIn) {
     return toJS(data.getIn(pathArr, notSetValue))
   }
 
@@ -46,7 +42,7 @@ export const dataToJS = (data, path, notSetValue) => {
 }
 
 export const snapshotToJS = (snapshot, path, notSetValue) => {
-  if(!(snapshot && snapshot.getIn)) {
+  if (!(snapshot && snapshot.getIn)) {
     return notSetValue
   }
 
@@ -54,7 +50,7 @@ export const snapshotToJS = (snapshot, path, notSetValue) => {
 
   const pathArr = snapshotPath.split(/\//).slice(1)
 
-  if(snapshot.getIn) {
+  if (snapshot.getIn) {
     return toJS(snapshot.getIn(pathArr, notSetValue))
   }
 
@@ -62,11 +58,11 @@ export const snapshotToJS = (snapshot, path, notSetValue) => {
 }
 
 export const isLoaded = function () {
-  if(!arguments || !arguments.length) {
+  if (!arguments || !arguments.length) {
     return true
   }
 
-  return _(arguments).map( a => (a===undefined) ? false : true ).reduce( (a, b) => a && b )
+  return _(arguments).map(a => (a === undefined) ? false : true).reduce((a, b) => a && b)
 }
 
 export const isEmpty = data => {

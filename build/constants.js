@@ -1,6 +1,6 @@
-'use strict';
+'use strict'
 
-var prefix = '@@reactReduxFirebase/';
+var prefix = '@@reactReduxFirebase/'
 
 module.exports = {
   SET: prefix + 'SET',
@@ -9,4 +9,4 @@ module.exports = {
   LOGOUT: prefix + 'LOGOUT',
   LOGIN_ERROR: prefix + 'LOGIN_ERROR',
   NO_VALUE: prefix + 'NO_VALUE'
-};
+}

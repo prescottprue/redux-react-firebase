@@ -1,4 +1,4 @@
-import {Map, List, fromJS} from 'immutable'
+import {fromJS} from 'immutable'
 import {
   SET,
   SET_PROFILE,
@@ -16,15 +16,13 @@ const initialState = fromJS({
   snapshot: {}
 })
 
-const pathToArr = path => path.split(/\//).filter( p => !!p )
+const pathToArr = path => path.split(/\//).filter(p => !!p)
 
 export default (state = initialState, action) => {
-
   const {path} = action
   let pathArr, retVal
 
-  switch(action.type) {
-
+  switch (action.type) {
 
     case SET:
       const {data, snapshot} = action
@@ -38,7 +36,7 @@ export default (state = initialState, action) => {
         retVal.setIn(['snapshot', ...pathArr], fromJS(snapshot))
       : retVal.deleteIn(['snapshot', ...pathArr])
 
-      return retVal;
+      return retVal
 
     case NO_VALUE:
       pathArr = pathToArr(path)
@@ -75,5 +73,4 @@ export default (state = initialState, action) => {
       return state
 
   }
-
 }

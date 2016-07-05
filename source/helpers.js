@@ -1,7 +1,6 @@
+import {size, map} from 'lodash'
 
-import _ from 'lodash'
-
-const fixPath = path => ((path.substring(0, 1) == '/') ? '' : '/') + path
+const fixPath = path => ((path.substring(0, 1) === '/') ? '' : '/') + path
 
 export const toJS = data => {
   if (data && data.toJS) {
@@ -62,9 +61,9 @@ export const isLoaded = function () {
     return true
   }
 
-  return _(arguments).map(a => (a === undefined) ? false : true).reduce((a, b) => a && b)
+  return map(arguments, a => a !== undefined).reduce((a, b) => a && b)
 }
 
 export const isEmpty = data => {
-  return !(data && _.size(data))
+  return !(data && size(data))
 }

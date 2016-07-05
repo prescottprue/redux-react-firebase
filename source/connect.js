@@ -38,18 +38,18 @@ const getEventsFromDefinition = def => flatMap(def.map(path => {
     return createEvents(transformEvent({ path }))
   }
 
-  if (typeof path == 'array' || path instanceof Array) {
-    return createEvents(transformEvent({ type: 'all', path: path[0]}))
+  if (typeof path === 'array' || path instanceof Array) {
+    return createEvents(transformEvent({ type: 'all', path: path[0] }))
   }
 
-  if (typeof path == 'object' || path instanceof Object) {
+  if (typeof path === 'object' || path instanceof Object) {
     const type = path.type || 'value'
     switch (type) {
       case 'value':
-        return createEvents(transformEvent({ path: path.path}))
+        return createEvents(transformEvent({ path: path.path }))
 
       case 'array':
-        return createEvents(transformEvent({ type: 'all', path: path.path}))
+        return createEvents(transformEvent({ type: 'all', path: path.path }))
     }
   }
 

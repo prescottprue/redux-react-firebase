@@ -1,4 +1,3 @@
-import Firebase from 'firebase'
 
 import connect from './connect'
 import compose from './compose'
@@ -11,4 +10,3 @@ module.exports = {
   reduxReactFirebase: compose,
   helpers
 }
-

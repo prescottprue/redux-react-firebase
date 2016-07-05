@@ -7,12 +7,14 @@ export default (url, config) => {
     const defaultConfig = {
       userProfile: null
     }
-
+    console.log('next:', { next, reducer, initialState })
     const store = next(reducer, initialState)
 
     const {dispatch} = store
 
-    const ref = new Firebase(url)
+    Firebase.initializeApp(url)
+
+    const ref = Firebase.database()
 
     const configs = Object.assign({}, defaultConfig, config)
 

@@ -94,8 +94,7 @@ export const watchEvent = (firebase, dispatch, event, path, dest, onlyLastEvent 
 
   setWatcher(firebase, event, watchPath, queryId)
 
-  if (event == 'first_child') {
-    return
+  if (event === 'first_child') {
     return firebase.ref.child(path).orderByKey().limitToFirst(1).once('value', snapshot => {
       if (snapshot.val() === null) {
         dispatch({
@@ -137,21 +136,24 @@ export const watchEvent = (firebase, dispatch, event, path, dest, onlyLastEvent 
           break
         case 'equalTo':
           let equalToParam = !doNotParse ? parseInt(param[1]) || param[1] : param[1]
-          equalToParam = equalToParam == 'null' ? null : equalToParam
-          query = param.length == 3 ? query.equalTo(equalToParam, param[2]) :
-                query.equalTo(equalToParam)
+          equalToParam = equalToParam === 'null' ? null : equalToParam
+          query = param.length === 3
+            ? query.equalTo(equalToParam, param[2])
+            : query.equalTo(equalToParam)
           break
         case 'startAt':
           let startAtParam = !doNotParse ? parseInt(param[1]) || param[1] : param[1]
-          startAtParam = startAtParam == 'null' ? null : startAtParam
-          query = param.length == 3 ? query.startAt(startAtParam, param[2]) :
-                query.startAt(startAtParam)
+          startAtParam = startAtParam === 'null' ? null : startAtParam
+          query = param.length === 3
+            ? query.startAt(startAtParam, param[2])
+            : query.startAt(startAtParam)
           break
         case 'endAt':
           let endAtParam = !doNotParse ? parseInt(param[1]) || param[1] : param[1]
-          endAtParam = endAtParam == 'null' ? null : endAtParam
-          query = param.length == 3 ? query.endAt(endAtParam, param[2]) :
-                query.endAt(endAtParam)
+          endAtParam = endAtParam === 'null' ? null : endAtParam
+          query = param.length === 3
+            ? query.endAt(endAtParam, param[2])
+            : query.endAt(endAtParam)
           break
         default:
           break
@@ -162,7 +164,7 @@ export const watchEvent = (firebase, dispatch, event, path, dest, onlyLastEvent 
     q.on(e, snapshot => {
       let data = (e === 'child_removed') ? undefined : snapshot.val()
       const resultPath = (dest) ? dest : (e === 'value') ? p : p + '/' + snapshot.key()
-      if (dest && e != 'child_removed') {
+      if (dest && e !== 'child_removed') {
         data = {
           _id: snapshot.key(),
           val: snapshot.val()
@@ -246,9 +248,9 @@ export const login = (dispatch, firebase, credentials) => {
         return ref.authWithOAuthToken(provider, token, handler)
       }
 
-      const auth = (type === 'popup') ?
-          ref.authWithOAuthPopup
-          : ref.authWithOAuthRedirect
+      const auth = (type === 'popup')
+        ? ref.authWithOAuthPopup
+        : ref.authWithOAuthRedirect
 
       return auth(provider, handler)
     }

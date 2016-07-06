@@ -59,7 +59,7 @@ const unsetWatcher = (firebase, event, path, queryId = undefined) => {
   if (firebase._.watchers[id] <= 1) {
     delete firebase._.watchers[id]
     if (event !== 'first_child') {
-      firebase.ref.child(path).off(event)
+      firebase.database().ref().child(path).off(event)
     }
   } else if (firebase._.watchers[id]) {
     firebase._.watchers[id]--
@@ -209,7 +209,7 @@ const unWatchUserProfile = (firebase) => {
   const authUid = firebase._.authUid
   const userProfile = firebase._.config.userProfile
   if (firebase._.profileWatch) {
-    firebase.ref.child(`${userProfile}/${authUid}`).off('value', firebase._.profileWatch)
+    firebase.database().ref().child(`${userProfile}/${authUid}`).off('value', firebase._.profileWatch)
     firebase._.profileWatch = null
   }
 }
@@ -219,7 +219,7 @@ const watchUserProfile = (dispatch, firebase) => {
   const userProfile = firebase._.config.userProfile
   unWatchUserProfile(firebase)
   if (firebase._.config.userProfile) {
-    firebase._.profileWatch = firebase.ref.child(`${userProfile}/${authUid}`).on('value', snap => {
+    firebase._.profileWatch = firebase.database().ref().child(`${userProfile}/${authUid}`).on('value', snap => {
       dispatch({
         type: SET_PROFILE,
         profile: snap.val()
@@ -305,7 +305,7 @@ export const createUser = (dispatch, firebase, credentials, profile) =>
 
 export const resetPassword = (dispatch, firebase, credentials) => {
   dispatchLoginError(dispatch, null)
-  firebase.database().ref().resetPassword(credentials, err => {
+  firebase.auth().resetPassword(credentials, err => {
     if (err) {
       switch (err.code) {
         case 'INVALID_USER':
@@ -323,7 +323,7 @@ export const resetPassword = (dispatch, firebase, credentials) => {
 
 export const changePassword = (dispatch, firebase, credentials) => {
   dispatchLoginError(dispatch, null)
-  firebase.database().ref().changePassword(credentials, err => {
+  firebase.auth().changePassword(credentials, err => {
     if (err) {
       switch (err.code) {
         case 'INVALID_PASSWORD':

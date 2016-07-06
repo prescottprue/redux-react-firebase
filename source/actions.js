@@ -94,9 +94,10 @@ export const watchEvent = (firebase, dispatch, event, path, dest, onlyLastEvent 
 
   setWatcher(firebase, event, watchPath, queryId)
 
-  if (event === 'first_child') {
-    return firebase.ref.child(path).orderByKey().limitToFirst(1).once('value', snapshot => {
-      if (snapshot.val() === null) {
+  if(event == 'first_child'){
+    return
+    return firebase.database().ref().child(path).orderByKey().limitToFirst(1).once('value', snapshot => {
+      if(snapshot.val() === null){
         dispatch({
           type: NO_VALUE,
           path
@@ -105,7 +106,7 @@ export const watchEvent = (firebase, dispatch, event, path, dest, onlyLastEvent 
     })
   }
 
-  let query = firebase.ref.child(path)
+  let query = firebase.database().ref().child(path);
 
   if (isQuery) {
     let doNotParse = false
@@ -243,29 +244,30 @@ export const login = (dispatch, firebase, credentials) => {
 
     const {token, provider, type} = credentials
 
-    if (provider) {
-      if (credentials.token) {
-        return ref.authWithOAuthToken(provider, token, handler)
+
+    if(provider) {
+
+      if(credentials.token) {
+        return firebase.auth().authWithOAuthToken( provider, token, handler )
       }
 
-      const auth = (type === 'popup')
-        ? ref.authWithOAuthPopup
-        : ref.authWithOAuthRedirect
+      const  auth = (type === 'popup') ?
+          firebase.auth().authWithOAuthPopup
+          : firebase.auth().authWithOAuthRedirect
 
       return auth(provider, handler)
     }
 
-    if (token) {
-      return ref.authWithCustomToken(token, handler)
+    if(token) {
+      return firebase.auth().authWithCustomToken(token, handler)
     }
 
-    ref.authWithPassword(credentials, handler)
+    firebase.auth().authWithPassword(credentials, handler)
   })
 }
 
 export const init = (dispatch, firebase) => {
-  const {ref} = firebase
-  ref.onAuth(authData => {
+  firebase.auth().onAuthStateChanged(authData => {
     if (!authData) {
       return dispatch({type: LOGOUT})
     }
@@ -276,7 +278,7 @@ export const init = (dispatch, firebase) => {
     dispatchLogin(dispatch, authData)
   })
 
-  ref.getAuth()
+  firebase.auth().currentUser
 }
 
 export const logout = (dispatch, firebase) => {

@@ -1,5 +1,6 @@
 
 import Firebase from 'firebase'
+
 import * as Actions from './actions'
 
 export default (url, config) => {
@@ -7,7 +8,6 @@ export default (url, config) => {
     const defaultConfig = {
       userProfile: null
     }
-    console.log('next:', { next, reducer, initialState })
     const store = next(reducer, initialState)
 
     const {dispatch} = store
@@ -18,14 +18,11 @@ export default (url, config) => {
 
     const configs = Object.assign({}, defaultConfig, config)
 
-    const firebase = {
-      ref,
-      _: {
+    const firebase = Object.assign({}, ref, Firebase, { _: {
         watchers: {},
         config: configs,
         authUid: null
-      }
-    }
+      }})
 
     const set = (path, value, onComplete) => ref.child(path).set(value, onComplete)
     const push = (path, value, onComplete) => ref.child(path).push(value, onComplete)

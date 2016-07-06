@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {Component, PropTypes} from 'react'
 import {watchEvents, unWatchEvents} from './actions'
 
 const defaultEvent = {
@@ -65,9 +65,9 @@ export default (dataOrFn = []) => WrappedComponent => {
       this.firebase = null
     }
 
-    // static contextTypes = {
-    //   store: PropTypes.object
-    // };
+    static contextTypes = {
+      store: PropTypes.object
+    };
 
     componentWillMount () {
       const {firebase, dispatch} = this.context.store

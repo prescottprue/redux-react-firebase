@@ -1,3 +1,8 @@
 {
-  "extends": "standard"
+  "extends": "standard",
+  "rules": {
+    "wrap-iife": "off",
+    "no-proto": "off",
+    "valid-typeof": "off"
+  }
 }

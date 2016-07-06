@@ -34,7 +34,7 @@ const getQueryIdFromPath = (path) => {
   let pathSplitted = path.split('#')
   path = pathSplitted[0]
 
-  let isQuery = pathSplitted.length > 1 ? true : false
+  let isQuery = pathSplitted.length > 1
   let queryParams = isQuery ? pathSplitted[1].split('&') : []
   let queryId = isQuery ? queryParams.map((param) => {
     let splittedParam = param.split('=')
@@ -43,9 +43,9 @@ const getQueryIdFromPath = (path) => {
     }
   }).filter(q => q) : undefined
 
-  return (queryId && queryId.length > 0) ?
-              queryId[0]
-          : ((isQuery) ? origPath : undefined)
+  return (queryId && queryId.length > 0)
+    ? queryId[0]
+    : ((isQuery) ? origPath : undefined)
 }
 
 const unsetWatcher = (firebase, event, path, queryId = undefined) => {
@@ -94,10 +94,10 @@ export const watchEvent = (firebase, dispatch, event, path, dest, onlyLastEvent 
 
   setWatcher(firebase, event, watchPath, queryId)
 
-  if(event == 'first_child'){
-    return
+  if (event === 'first_child') {
+    // return
     return firebase.database().ref().child(path).orderByKey().limitToFirst(1).once('value', snapshot => {
-      if(snapshot.val() === null){
+      if (snapshot.val() === null) {
         dispatch({
           type: NO_VALUE,
           path
@@ -106,7 +106,7 @@ export const watchEvent = (firebase, dispatch, event, path, dest, onlyLastEvent 
     })
   }
 
-  let query = firebase.database().ref().child(path);
+  let query = firebase.database().ref().child(path)
 
   if (isQuery) {
     let doNotParse = false
@@ -164,7 +164,7 @@ export const watchEvent = (firebase, dispatch, event, path, dest, onlyLastEvent 
   const runQuery = (q, e, p) => {
     q.on(e, snapshot => {
       let data = (e === 'child_removed') ? undefined : snapshot.val()
-      const resultPath = (dest) ? dest : (e === 'value') ? p : p + '/' + snapshot.key()
+      const resultPath = dest || (e === 'value') ? p : p + '/' + snapshot.key()
       if (dest && e !== 'child_removed') {
         data = {
           _id: snapshot.key(),
@@ -230,8 +230,6 @@ const watchUserProfile = (dispatch, firebase) => {
 
 export const login = (dispatch, firebase, credentials) => {
   return new Promise((resolve, reject) => {
-    const {ref} = firebase
-
     dispatchLoginError(dispatch, null)
 
     const handler = (err, authData) => {
@@ -244,21 +242,19 @@ export const login = (dispatch, firebase, credentials) => {
 
     const {token, provider, type} = credentials
 
-
-    if(provider) {
-
-      if(credentials.token) {
-        return firebase.auth().authWithOAuthToken( provider, token, handler )
+    if (provider) {
+      if (credentials.token) {
+        return firebase.auth().authWithOAuthToken(provider, token, handler)
       }
 
-      const  auth = (type === 'popup') ?
-          firebase.auth().authWithOAuthPopup
-          : firebase.auth().authWithOAuthRedirect
+      const auth = (type === 'popup')
+        ? firebase.auth().authWithOAuthPopup
+        : firebase.auth().authWithOAuthRedirect
 
       return auth(provider, handler)
     }
 
-    if(token) {
+    if (token) {
       return firebase.auth().authWithCustomToken(token, handler)
     }
 
@@ -282,42 +278,34 @@ export const init = (dispatch, firebase) => {
 }
 
 export const logout = (dispatch, firebase) => {
-  const {ref} = firebase
-  ref.unauth()
+  firebase.auth().unauth()
   dispatch({type: LOGOUT})
   firebase._.authUid = null
   unWatchUserProfile(firebase)
 }
 
-export const createUser = (dispatch, firebase, credentials, profile) => {
-  const {ref} = firebase
-  return new Promise((resolve, reject) => {
+export const createUser = (dispatch, firebase, credentials, profile) =>
+  new Promise((resolve, reject) => {
     dispatchLoginError(dispatch, null)
-    ref.createUser(credentials, (err, userData) => {
+    firebase.auth().createUser(credentials, (err, userData) => {
       if (err) {
         dispatchLoginError(dispatch, err)
         return reject(err)
       }
 
       if (profile && firebase._.config.userProfile) {
-        ref.child(`${firebase._.config.userProfile}/${userData.uid}`).set(profile)
+        firebase.database().ref().child(`${firebase._.config.userProfile}/${userData.uid}`).set(profile)
       }
 
       login(dispatch, firebase, credentials)
-          .then(() => {
-            resolve(userData.uid)
-          })
-          .catch(err => {
-            reject(err)
-          })
+        .then(() => resolve(userData.uid))
+        .catch(err => reject(err))
     })
   })
-}
 
 export const resetPassword = (dispatch, firebase, credentials) => {
-  const {ref} = firebase
   dispatchLoginError(dispatch, null)
-  ref.resetPassword(credentials, err => {
+  firebase.database().ref().resetPassword(credentials, err => {
     if (err) {
       switch (err.code) {
         case 'INVALID_USER':
@@ -334,9 +322,8 @@ export const resetPassword = (dispatch, firebase, credentials) => {
 }
 
 export const changePassword = (dispatch, firebase, credentials) => {
-  const {ref} = firebase
   dispatchLoginError(dispatch, null)
-  ref.changePassword(credentials, err => {
+  firebase.database().ref().changePassword(credentials, err => {
     if (err) {
       switch (err.code) {
         case 'INVALID_PASSWORD':
@@ -354,3 +341,5 @@ export const changePassword = (dispatch, firebase, credentials) => {
     return dispatchLoginError(dispatch, new Error('User password changed successfully!'))
   })
 }
+
+export default { watchEvents, unWatchEvents, init, logout, createUser, resetPassword, changePassword }

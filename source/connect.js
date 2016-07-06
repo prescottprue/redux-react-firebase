@@ -1,4 +1,4 @@
-import React, {Component, PropTypes} from 'react'
+import React, {PropTypes} from 'react'
 import {watchEvents, unWatchEvents} from './actions'
 
 const defaultEvent = {
@@ -6,8 +6,8 @@ const defaultEvent = {
   type: 'value'
 }
 
-const ensureCallable = maybeFn =>
-  typeof maybeFn === 'function' ? maybeFn : _ => maybeFn
+const ensureCallable = maybeFn => //eslint-disable-line
+  typeof maybeFn === 'function' ? maybeFn : () => maybeFn //eslint-disable-line
 
 const flatMap = arr => (arr && arr.length) ? arr.reduce((a, b) => a.concat(b)) : []
 
@@ -38,7 +38,7 @@ const getEventsFromDefinition = def => flatMap(def.map(path => {
     return createEvents(transformEvent({ path }))
   }
 
-  if (typeof path === 'array' || path instanceof Array) {
+  if (typeof path === 'array' || path instanceof Array) { // eslint-disable-line
     return createEvents(transformEvent({ type: 'all', path: path[0] }))
   }
 
@@ -57,7 +57,7 @@ const getEventsFromDefinition = def => flatMap(def.map(path => {
 }))
 
 export default (dataOrFn = []) => WrappedComponent => {
-  class FirebaseConnect extends Component {
+  class FirebaseConnect extends React.Component {
 
     constructor (props, context) {
       super(props, context)
@@ -65,9 +65,9 @@ export default (dataOrFn = []) => WrappedComponent => {
       this.firebase = null
     }
 
-    static contextTypes = {
-      store: PropTypes.object
-    };
+    // static contextTypes = {
+    //   store: PropTypes.object
+    // };
 
     componentWillMount () {
       const {firebase, dispatch} = this.context.store
@@ -97,6 +97,10 @@ export default (dataOrFn = []) => WrappedComponent => {
       )
     }
   }
-
+  FirebaseConnect.contextTypes = {
+    store: function () {
+      return PropTypes.object.isRequired
+    }
+  }
   return FirebaseConnect
 }

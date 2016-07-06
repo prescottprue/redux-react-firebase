@@ -20,7 +20,8 @@ const pathToArr = path => path.split(/\//).filter(p => !!p)
 
 export default (state = initialState, action) => {
   const {path} = action
-  let pathArr, retVal
+  let pathArr
+  let retVal
 
   switch (action.type) {
 
@@ -28,13 +29,13 @@ export default (state = initialState, action) => {
       const {data, snapshot} = action
       pathArr = pathToArr(path)
 
-      retVal = (data !== undefined) ?
-        state.setIn(['data', ...pathArr], fromJS(data))
-      : state.deleteIn(['data', ...pathArr])
+      retVal = (data !== undefined)
+        ? state.setIn(['data', ...pathArr], fromJS(data))
+        : state.deleteIn(['data', ...pathArr])
 
-      retVal = (snapshot !== undefined) ?
-        retVal.setIn(['snapshot', ...pathArr], fromJS(snapshot))
-      : retVal.deleteIn(['snapshot', ...pathArr])
+      retVal = (snapshot !== undefined)
+        ? retVal.setIn(['snapshot', ...pathArr], fromJS(snapshot))
+        : retVal.deleteIn(['snapshot', ...pathArr])
 
       return retVal
 
@@ -46,9 +47,9 @@ export default (state = initialState, action) => {
 
     case SET_PROFILE:
       const {profile} = action
-      return (profile !== undefined) ?
-        state.setIn(['profile'], fromJS(profile))
-      : state.deleteIn(['profile'])
+      return (profile !== undefined)
+        ? state.setIn(['profile'], fromJS(profile))
+        : state.deleteIn(['profile'])
 
     case LOGOUT:
       return fromJS({

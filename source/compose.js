@@ -1,6 +1,4 @@
-
 import Firebase from 'firebase'
-
 import * as Actions from './actions'
 
 export default (url, config) => {
@@ -11,8 +9,10 @@ export default (url, config) => {
     const store = next(reducer, initialState)
 
     const {dispatch} = store
-
-    Firebase.initializeApp(url)
+    // console.log('firebase:', Firebase, Object.getOwnPropertyNames(Firebase))
+    try {
+      Firebase.initializeApp(url)
+    } catch (err) { console.warn('Firebase error:', err) }
 
     const ref = Firebase.database()
 

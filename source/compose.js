@@ -1,7 +1,7 @@
 import Firebase from 'firebase'
 import * as Actions from './actions'
 
-export default (url, config) => {
+export default (fbConfig, config) => {
   return next => (reducer, initialState) => {
     const defaultConfig = {
       userProfile: null
@@ -9,12 +9,15 @@ export default (url, config) => {
     const store = next(reducer, initialState)
 
     const {dispatch} = store
-    // console.log('firebase:', Firebase, Object.getOwnPropertyNames(Firebase))
-    try {
-      Firebase.initializeApp(url)
-    } catch (err) { console.warn('Firebase error:', err) }
 
-    const ref = Firebase.database()
+    // TODO: Create a Firebase util to avoid using this try/catch
+    try {
+      Firebase.initializeApp(fbConfig)
+    } catch (err) {
+      console.warn('Firebase error:', err)
+    }
+
+    const ref = Firebase.database().ref()
 
     const configs = Object.assign({}, defaultConfig, config)
 

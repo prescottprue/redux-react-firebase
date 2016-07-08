@@ -16,7 +16,7 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-exports.default = function (url, config) {
+exports.default = function (fbConfig, config) {
   return function (next) {
     return function (reducer, initialState) {
       var defaultConfig = {
@@ -25,15 +25,16 @@ exports.default = function (url, config) {
       var store = next(reducer, initialState);
 
       var dispatch = store.dispatch;
-      // console.log('firebase:', Firebase, Object.getOwnPropertyNames(Firebase))
+
+      // TODO: Create a Firebase util to avoid using this try/catch
 
       try {
-        _firebase2.default.initializeApp(url);
+        _firebase2.default.initializeApp(fbConfig);
       } catch (err) {
         console.warn('Firebase error:', err);
       }
 
-      var ref = _firebase2.default.database();
+      var ref = _firebase2.default.database().ref();
 
       var configs = Object.assign({}, defaultConfig, config);
 

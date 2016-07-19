@@ -280,9 +280,7 @@ export const createUser = (dispatch, firebase, credentials, profile) =>
 
 export const resetPassword = (dispatch, firebase, email) => {
   dispatchLoginError(dispatch, null)
-  return firebase.auth().sendPasswordResetEmail(email).then(() => {
-    return dispatchLoginError(dispatch, new Error('Password reset email sent successfully!'))
-  }).catch((err) => {
+  return firebase.auth().sendPasswordResetEmail(email).catch((err) => {
     if (err) {
       switch (err.code) {
         case 'INVALID_USER':

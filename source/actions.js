@@ -294,25 +294,4 @@ export const resetPassword = (dispatch, firebase, email) => {
   });
 }
 
-export const changePassword = (dispatch, firebase, credentials) => {
-  dispatchLoginError(dispatch, null)
-  firebase.auth().changePassword(credentials, err => {
-    if (err) {
-      switch (err.code) {
-        case 'INVALID_PASSWORD':
-          dispatchLoginError(dispatch, new Error('The specified user account password is incorrect.'))
-          break
-        case 'INVALID_USER':
-          dispatchLoginError(dispatch, new Error('The specified user account does not exist.'))
-          break
-        default:
-          dispatchLoginError(dispatch, err)
-      }
-      return
-    }
-
-    return dispatchLoginError(dispatch, new Error('User password changed successfully!'))
-  })
-}
-
-export default { watchEvents, unWatchEvents, init, logout, createUser, resetPassword, changePassword }
+export default { watchEvents, unWatchEvents, init, logout, createUser, resetPassword }

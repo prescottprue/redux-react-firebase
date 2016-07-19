@@ -240,11 +240,13 @@ export const login = (dispatch, firebase, credentials) => {
       resolve(authData)
     }
 
-    const {token, provider, type} = credentials
+    const {token, provider, type, email, password} = credentials
 
     if (provider) {
+      // TODO: implement oAuth
+      return reject('Need to implement oAuth');
+
       if (credentials.token) {
-        return firebase.auth().authWithOAuthToken(provider, token, handler)
       }
 
       const auth = (type === 'popup')
@@ -255,10 +257,10 @@ export const login = (dispatch, firebase, credentials) => {
     }
 
     if (token) {
-      return firebase.auth().authWithCustomToken(token, handler)
+      return firebase.auth().signInWithCustomToken(token, handler)
     }
 
-    firebase.auth().authWithPassword(credentials, handler)
+    return firebase.auth().signInWithEmailAndPassword(email, password);
   })
 }
 

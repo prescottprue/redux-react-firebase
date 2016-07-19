@@ -278,7 +278,7 @@ export const init = (dispatch, firebase) => {
 }
 
 export const logout = (dispatch, firebase) => {
-  firebase.auth().unauth()
+  firebase.auth().signOut()
   dispatch({type: LOGOUT})
   firebase._.authUid = null
   unWatchUserProfile(firebase)

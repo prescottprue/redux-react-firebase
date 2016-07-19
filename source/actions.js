@@ -232,35 +232,8 @@ export const login = (dispatch, firebase, credentials) => {
   return new Promise((resolve, reject) => {
     dispatchLoginError(dispatch, null)
 
-    const handler = (err, authData) => {
-      if (err) {
-        dispatchLoginError(dispatch, err)
-        return reject(err)
-      }
-      resolve(authData)
-    }
-
-    const {token, provider, type, email, password} = credentials
-
-    if (provider) {
-      // TODO: implement oAuth
-      return reject('Need to implement oAuth');
-
-      if (credentials.token) {
-      }
-
-      const auth = (type === 'popup')
-        ? firebase.auth().authWithOAuthPopup
-        : firebase.auth().authWithOAuthRedirect
-
-      return auth(provider, handler)
-    }
-
-    if (token) {
-      return firebase.auth().signInWithCustomToken(token, handler)
-    }
-
-    return firebase.auth().signInWithEmailAndPassword(email, password);
+    const {email, password} = credentials
+    firebase.auth().signInWithEmailAndPassword(email, password).then(resolve).catch(reject);
   })
 }
 

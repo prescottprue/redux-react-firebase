@@ -20,8 +20,7 @@ export default (config) => {
 
     const configs = Object.assign({}, defaultConfig, config)
 
-    const firebase = Firebase;
-    Object.defineProperty(firebase, '_', {
+    const firebase = Object.defineProperty(Firebase, '_', {
       watchers: {},
       config: configs,
       authUid: null

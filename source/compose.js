@@ -20,11 +20,12 @@ export default (config) => {
 
     const configs = Object.assign({}, defaultConfig, config)
 
-    const firebase = Object.assign({}, ref, Firebase, { _: {
+    const firebase = Firebase;
+    Object.defineProperty(firebase, '_', {
       watchers: {},
       config: configs,
       authUid: null
-    }})
+    });
 
     const set = (path, value, onComplete) => ref.child(path).set(value, onComplete)
     const push = (path, value, onComplete) => ref.child(path).push(value, onComplete)

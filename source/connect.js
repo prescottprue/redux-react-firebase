@@ -6,8 +6,12 @@ const defaultEvent = {
   type: 'value'
 }
 
-const ensureCallable = maybeFn => //eslint-disable-line
-  typeof maybeFn === 'function' ? maybeFn : () => maybeFn //eslint-disable-line
+const fixPath = (path) =>  ((path.substring(0,1) == '/') ? '': '/') + path
+
+const isEqualArrays = (a, b) => a.length == b.length && a.every((v,i) => v === b[i])
+
+const ensureCallable = maybeFn =>
+  typeof maybeFn === 'function' ? maybeFn : (_ => maybeFn)
 
 const flatMap = arr => (arr && arr.length) ? arr.reduce((a, b) => a.concat(b)) : []
 
@@ -62,6 +66,7 @@ export default (dataOrFn = []) => WrappedComponent => {
     constructor (props, context) {
       super(props, context)
       this._firebaseEvents = []
+      this._pathsToListen = undefined;
       this.firebase = null
     }
 
@@ -73,12 +78,30 @@ export default (dataOrFn = []) => WrappedComponent => {
       const {firebase, dispatch} = this.context.store
 
       const linkFn = ensureCallable(dataOrFn)
-      const data = linkFn(this.props, firebase)
+      this._pathsToListen = linkFn(this.props, firebase)
 
       const {ref, helpers} = firebase
       this.firebase = {ref, ...helpers}
 
-      this._firebaseEvents = getEventsFromDefinition(data)
+      this._firebaseEvents = getEventsFromDefinition(this._pathsToListen)
+      watchEvents(firebase, dispatch, this._firebaseEvents)
+    }
+
+    componentWillReceiveProps(nextProps) {
+      const {firebase, dispatch} = this.context.store
+
+      const linkFn = ensureCallable(dataOrFn)
+      const newPathsToListen = linkFn(nextProps, firebase)
+
+      if (isEqualArrays(newPathsToListen, this._pathsToListen)) {
+        return;
+      }
+
+      this._pathsToListen = newPathsToListen;
+
+      unWatchEvents(firebase, this._firebaseEvents)
+
+      this._firebaseEvents = getEventsFromDefinition(this._pathsToListen)
       watchEvents(firebase, dispatch, this._firebaseEvents)
     }
 

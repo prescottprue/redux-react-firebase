@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {PropTypes} from 'react'
 import {watchEvents, unWatchEvents} from './actions'
 
 const defaultEvent = {
@@ -6,10 +6,14 @@ const defaultEvent = {
   type: 'value'
 }
 
+const fixPath = (path) =>  ((path.substring(0,1) == '/') ? '': '/') + path
+
+const isEqualArrays = (a, b) => a.length == b.length && a.every((v,i) => v === b[i])
+
 const ensureCallable = maybeFn =>
   typeof maybeFn === 'function' ? maybeFn : _ => maybeFn
 
-const flatMap = arr =>  (arr && arr.length) ? arr.reduce((a, b) => a.concat(b)) : []
+const flatMap = arr => (arr && arr.length) ? arr.reduce((a, b) => a.concat(b)) : []
 
 const createEvents = ({type, path}) => {
   switch (type) {
@@ -33,23 +37,23 @@ const createEvents = ({type, path}) => {
 
 const transformEvent = event => Object.assign({}, defaultEvent, event)
 
-const getEventsFromDefinition = def => flatMap( def.map( path => {
-  if(typeof path === 'string' || path instanceof String) {
+const getEventsFromDefinition = def => flatMap(def.map(path => {
+  if (typeof path === 'string' || path instanceof String) {
     return createEvents(transformEvent({ path }))
   }
 
-  if(typeof path == 'array' || path instanceof Array){
-    return createEvents(transformEvent({ type: 'all', path: path[0]}))
+  if (typeof path === 'array' || path instanceof Array) { // eslint-disable-line
+    return createEvents(transformEvent({ type: 'all', path: path[0] }))
   }
 
-  if(typeof path == 'object' || path instanceof Object){
+  if (typeof path === 'object' || path instanceof Object) {
     const type = path.type || 'value'
-    switch(type){
+    switch (type) {
       case 'value':
-        return createEvents(transformEvent({ path: path.path}))
+        return createEvents(transformEvent({ path: path.path }))
 
       case 'array':
-        return createEvents(transformEvent({ type: 'all', path: path.path}))
+        return createEvents(transformEvent({ type: 'all', path: path.path }))
     }
   }
 
@@ -57,11 +61,12 @@ const getEventsFromDefinition = def => flatMap( def.map( path => {
 }))
 
 export default (dataOrFn = []) => WrappedComponent => {
-  class FirebaseConnect extends Component {
+  class FirebaseConnect extends React.Component {
 
     constructor (props, context) {
       super(props, context)
       this._firebaseEvents = []
+      this._pathsToListen = undefined;
       this.firebase = null
     }
 
@@ -73,12 +78,30 @@ export default (dataOrFn = []) => WrappedComponent => {
       const {firebase, dispatch} = this.context.store
 
       const linkFn = ensureCallable(dataOrFn)
-      const data = linkFn(this.props, firebase)
+      this._pathsToListen = linkFn(this.props, firebase)
 
       const {ref, helpers} = firebase
       this.firebase = {ref, ...helpers}
 
-      this._firebaseEvents = getEventsFromDefinition(data)
+      this._firebaseEvents = getEventsFromDefinition(this._pathsToListen)
+      watchEvents(firebase, dispatch, this._firebaseEvents)
+    }
+
+    componentWillReceiveProps(nextProps) {
+      const {firebase, dispatch} = this.context.store
+
+      const linkFn = ensureCallable(dataOrFn)
+      const newPathsToListen = linkFn(nextProps, firebase)
+
+      if (isEqualArrays(newPathsToListen, this._pathsToListen)) {
+        return;
+      }
+
+      this._pathsToListen = newPathsToListen;
+
+      unWatchEvents(firebase, this._firebaseEvents)
+
+      this._firebaseEvents = getEventsFromDefinition(this._pathsToListen)
       watchEvents(firebase, dispatch, this._firebaseEvents)
     }
 
@@ -97,6 +120,10 @@ export default (dataOrFn = []) => WrappedComponent => {
       )
     }
   }
-
+  FirebaseConnect.contextTypes = {
+    store: function () {
+      return PropTypes.object.isRequired
+    }
+  }
   return FirebaseConnect
 }
